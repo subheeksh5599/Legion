@@ -1,0 +1,15 @@
+[project]
+name = "legion"
+version = "1.0.0"
+description = "Autonomous Red-Team Agents for Legacy Systems"
+requires-python = ">=3.10"
+
+[project.scripts]
+legion = "cli.legion:main"
+
+[project.optional-dependencies]
+api = ["fastapi", "uvicorn"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
