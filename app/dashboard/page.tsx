@@ -124,6 +124,26 @@ export default function DashboardPage() {
     return () => clearInterval(interval);
   }, [fetchDashboard]);
 
+  const pollUntilDone = async (scanId: string, maxSecs = 60) => {
+    for (let i = 0; i < maxSecs * 2; i++) {
+      await new Promise((r) => setTimeout(r, 500));
+      try {
+        const r = await fetch(`${API}/api/scan/${scanId}`);
+        if (!r.ok) continue;
+        const d = await r.json();
+        if (d.status === "complete") {
+          setScan(d);
+          setLoading(false);
+          return;
+        }
+      } catch {
+        // retry
+      }
+    }
+    setLoading(false);
+    setError("Scan timed out");
+  };
+
   const runScan = async () => {
     if (!target) return;
     setLoading(true);
@@ -137,22 +157,7 @@ export default function DashboardPage() {
       });
       if (res.ok) {
         const data = await res.json();
-        // Poll until scan completes
-        const pollForDone = setInterval(async () => {
-          try {
-            const pollRes = await fetch(`${API}/api/scan/${data.id}`);
-            if (pollRes.ok) {
-              const scanData = await pollRes.json();
-              if (scanData.status === "complete") {
-                setScan(scanData);
-                setLoading(false);
-                clearInterval(pollForDone);
-              }
-            }
-          } catch {
-            // keep polling
-          }
-        }, 1000);
+        pollUntilDone(data.id);
       } else {
         setError("Failed to start scan");
         setLoading(false);
