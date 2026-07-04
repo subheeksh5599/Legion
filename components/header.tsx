@@ -36,10 +36,10 @@ export function Header(): ReactNode {
             Features
           </Link>
           <Link
-            href="#deploy"
+            href="/dashboard"
             className="group inline-flex items-center gap-2 rounded-md bg-accent px-4 py-2 text-sm font-medium text-white transition-all duration-500 ease-out hover:rounded-[50px] hover:bg-accent/90"
           >
-            <span>Deploy Agents</span>
+            <span>Dashboard</span>
             <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 transition-all duration-300 group-hover:scale-110">
               <ChevronRightIcon className="h-3 w-3" />
             </span>
