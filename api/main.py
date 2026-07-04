@@ -105,36 +105,39 @@ async def health():
     return {"status": "operational", "version": "1.0.0", "agents_ready": True}
 
 
-@app.post("/api/scan", response_model=ScanResponse)
+from concurrent.futures import ThreadPoolExecutor
+
+executor = ThreadPoolExecutor(max_workers=2)
+
+
+def _run_scan(report_id: str, target: str):
+    orchestrator = AgentOrchestrator()
+    report = orchestrator.scan(target)
+    active_scans[report_id] = report
+
+    subnet.register_codebase(target, target)
+    subnet.register_miner("miner-01")
+    subnet.submit_findings(
+        "miner-01", target,
+        [{"vuln_type": f.vuln_type.value, "severity": f.severity.value,
+          "file_path": f.file_path, "line_number": f.line_number,
+          "evidence": f.evidence, "confidence": f.confidence}
+         for f in report.findings][:50],
+    )
+    subnet.validate_submissions()
+
+
+@app.post("/api/scan")
 async def start_scan(req: ScanRequest):
     if not os.path.exists(req.target):
         raise HTTPException(400, f"Target path does not exist: {req.target}")
 
-    orchestrator = AgentOrchestrator()
-    report = orchestrator.scan(req.target)
-    active_scans[report.id] = report
-
-    # Submit to subnet
-    codebase_hash = subnet.register_codebase(req.target, req.target)
-    subnet.register_miner("miner-01")
-    subnet.submit_findings(
-        "miner-01",
-        req.target,
-        [
-            {
-                "vuln_type": f.vuln_type.value,
-                "severity": f.severity.value,
-                "file_path": f.file_path,
-                "line_number": f.line_number,
-                "evidence": f.evidence,
-                "confidence": f.confidence,
-            }
-            for f in report.findings
-        ][:50],
+    report_id = uuid.uuid4().hex[:16]
+    active_scans[report_id] = ScanReport(
+        id=report_id, target=req.target, status=ScanStatus.SCANNING,
     )
-    subnet.validate_submissions()
-
-    return _format_report(report)
+    executor.submit(_run_scan, report_id, req.target)
+    return {"id": report_id, "target": req.target, "status": "scanning"}
 
 
 @app.get("/api/scan/{scan_id}")

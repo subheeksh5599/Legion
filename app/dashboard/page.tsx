@@ -127,6 +127,7 @@ export default function DashboardPage() {
   const runScan = async () => {
     if (!target) return;
     setLoading(true);
+    setScan(null);
     setError("");
     try {
       const res = await fetch(`${API}/api/scan`, {
@@ -136,14 +137,30 @@ export default function DashboardPage() {
       });
       if (res.ok) {
         const data = await res.json();
-        setScan(data);
+        // Poll until scan completes
+        const pollForDone = setInterval(async () => {
+          try {
+            const pollRes = await fetch(`${API}/api/scan/${data.id}`);
+            if (pollRes.ok) {
+              const scanData = await pollRes.json();
+              if (scanData.status === "complete") {
+                setScan(scanData);
+                setLoading(false);
+                clearInterval(pollForDone);
+              }
+            }
+          } catch {
+            // keep polling
+          }
+        }, 1000);
       } else {
         setError("Failed to start scan");
+        setLoading(false);
       }
     } catch {
-      setError("Cannot connect to Legion API. Start with: legion serve");
+      setError("Cannot connect to Legion API. Start with: uvicorn api.main:app");
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
