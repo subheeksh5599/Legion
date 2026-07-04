@@ -1,18 +1,13 @@
-"""
-Legion Dashboard - Real-time scan monitoring and vulnerability tracking.
-"""
-
 "use client";
+// Legion Dashboard — Real-time scan monitoring and vulnerability tracking.
 
 import { useState, useEffect, useCallback } from "react";
 import {
-  Shield,
   Bug,
   AlertTriangle,
   CheckCircle2,
   ScanLine,
   Activity,
-  ChevronRight,
   RefreshCw,
 } from "lucide-react";
 import { motion } from "motion/react";
