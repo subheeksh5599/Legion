@@ -40,7 +40,7 @@ export function FinalCTA(): ReactNode {
           </motion.p>
 
           <motion.a
-            href="https://github.com/legion"
+            href="https://github.com/subheeksh5599/Legion"
             className="group inline-flex w-full items-center justify-center gap-3 rounded-md bg-accent px-6 py-3 font-medium text-white transition-all duration-500 ease-out hover:rounded-[50px] hover:bg-accent/90 sm:w-auto"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}

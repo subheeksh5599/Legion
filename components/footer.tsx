@@ -15,7 +15,7 @@ const fadeInUp = {
 };
 
 const links = [
-  { label: "GitHub", href: "https://github.com/legion" },
+  { label: "GitHub", href: "https://github.com/subheeksh5599/Legion" },
   { label: "Documentation", href: "#" },
   { label: "Bittensor Subnet", href: "#" },
   { label: "Agentverse", href: "#" },
@@ -39,7 +39,7 @@ export function Footer(): ReactNode {
               verification in Venice TEE. On-chain audit trail on Solana.
             </p>
             <Link
-              href="https://github.com/legion"
+              href="https://github.com/subheeksh5599/Legion"
               className="group mt-6 inline-flex items-center gap-3 rounded-md border border-foreground/10 px-4 py-2 font-medium transition-all duration-300 hover:border-accent/50"
             >
               <span>View on GitHub</span>
